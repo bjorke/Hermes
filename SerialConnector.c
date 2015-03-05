@@ -15,7 +15,7 @@ int serialport_read_until(int fd, char* buf, char until);
 
 char* serialport = "/dev/tty.usbmodem1411";
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[])    
 {
     int fd = 0;
     int baudrate = B9600;  // default
