@@ -24,21 +24,23 @@ FILE *file;
 void  readport(void){
 	unsigned char buff;
 	file = fopen( "output.txt", "w+" );
-  int looper = 0;
-  while (looper < 1000) {
-    n = read(fd, &buff, 1);
-    //	fcntl(fd,F_SETFL,0);
-    if (n == -1) switch(errno) {
-    case EAGAIN: /* sleep() */
-      continue;
+	int looper = 0;
+  	while (looper < 1000) {
+    		n = read(fd, &buff, 1);
+		//	fcntl(fd,F_SETFL,0);
+		if (n == -1) switch(errno) {
+		case EAGAIN: /* sleep() */
+		continue;
 
-    }
-    if (n ==0) break;
-    fputc(buff, file);
-    printf("%d \"%c\"\n", n,buff);
-    looper++;
-  }
-  fclose (file);
+		}
+		if (n ==0) {
+			break
+		};
+		fputc(buff, file);
+		printf("%d \"%c\"\n", n,buff);
+		looper++;
+	}
+	fclose (file);
 }
 void openport(void){
 
