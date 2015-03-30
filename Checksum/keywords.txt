@@ -1,0 +1,12 @@
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Checksum	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+validate_verhoeff	KEYWORD2
+generate_verhoeff KEYWORD2
