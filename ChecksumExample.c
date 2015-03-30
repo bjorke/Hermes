@@ -62,8 +62,8 @@ int main(int argc, char *argv[])
   char str[30] = "12313212111231321211";
   int retVal = generate_verhoeff(str);
   printf("%d\n",retVal);
-  char str2[20] = "4";
-  printf("%d\n",validate_verhoeff(str));
+  char str2[30] = "123132121112313212115";
+  printf("%d\n",validate_verhoeff(str2));
   return 0;
 
 };
