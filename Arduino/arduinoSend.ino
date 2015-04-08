@@ -2,48 +2,79 @@
 #include <Checksum.h>
 Checksum _Checksum;
 
-#define trigPin 13
-#define echoPin 12
-
+#define sonar1TrigPin 13
+#define sonar1EchoPin 12
+#define sonar2TrigPin 13
+#define sonar2EchoPin 12
+#define sonar3TrigPin 13
+#define sonar3EchoPin 12
+#define ir1Port 0
+#define ir2Port 1
 
 void setup() {
   Serial.begin(9600);
 
   // set up sonar
 
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
-
-
-
+  pinMode(sonar1TrigPin, OUTPUT);
+  pinMode(sonar1EchoPin, INPUT);
+  pinMode(sonar2TrigPin, OUTPUT);
+  pinMode(sonar2EchoPin, INPUT);
+  pinMode(sonar3TrigPin, OUTPUT);
+  pinMode(sonar3EchoPin, INPUT);
 }
 
 void loop() {
-  short int duration,distance,distance1,distance2;
-  digitalWrite(trigPin, LOW);
+  //sonar setup
+  short int sonar1,sonar2,sonar3;
+  sonar1 = sonar(sonar1EchoPin,sonar1TrigPin);
+  sonar2 = sonar(sonar2EchoPin,sonar2TrigPin);
+  sonar3 = sonar(sonar3EchoPin,sonar3TrigPin);
+  //ir setup
+  short int ir1, ir2;
+  ir1 = ir(ir1Port);
+  ir2 = ir(ir2Port);
+  //Generate and send message
+  Serial.println(generateMessage(sonar1,sonar2,sonar3,ir1,ir2));
+
+  delay(1);
+}
+short int ir(short int irPort){
+  short int ir;
+  ir = analogRead (irPort);
+  return ((short int)ir / 615) * 1024;
+}
+short int sonar(short int echo,short int trigger){
+  short int duration;
+  digitalWrite(trigger, LOW);
   delayMicroseconds(2);
-  digitalWrite(trigPin, HIGH);
+  digitalWrite(trigger, HIGH);
   delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  duration = pulseIn(echoPin, HIGH);
-  distance = (duration/2) / 29.1;
-
-  distance1 = distance *1.564;
-  distance2 = distance *0.654;
-
+  digitalWrite(trigger, LOW);
+  duration = pulseIn(echo, HIGH);
+  return (duration/2) / 29.1;
+}
+String generateMessage(short int sonar1,short int sonar2,short int sonar3,short int ir1,short int ir2){
+  //checksum
   char sumCheck;
-  sumCheck = distance;
+  sumCheck = sonar1;
+  sumCheck += sonar2;
+  sumCheck += sonar3;
+  sumCheck += ir1;
+  sumCheck += ir2;
   short int checkSum = _Checksum.generate_verhoeff(&sumCheck);
 
   String sendString = "!";
-  sendString += distance;
+  sendString += sonar1;
   sendString += ",";
-  sendString += distance1;
+  sendString += sonar2;
   sendString += ",";
-  sendString += distance2;
+  sendString += sonar3;
+  sendString += ",";
+  sendString += ir1;
+  sendString += ",";
+  sendString += ir2;
   sendString += ",";
   sendString += checkSum;
-  Serial.println(sendString);
-
-  delay(1);
+  return sendString;
 }
