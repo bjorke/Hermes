@@ -13,6 +13,8 @@ int escpos = 0;    // variable to store the servo position
 int ch1; // Here's where we'll keep our channel values
 int ch2;
 
+int incomingByte = 0;   // for incoming serial data
+
 void setup() {
 
   pinMode(6, INPUT);
@@ -34,12 +36,23 @@ void loop() {
   int autonomous = digitalRead(2);
   
   if(autonomous) {
+    
     digitalWrite(13, LOW); // switch off LED on board
     
     steeringServo.writeMicroseconds(random(1300, 1600));
     escServo.writeMicroseconds(random(1300, 1600));
     delay(500);
+    
   } else {
+    
+      if (Serial.available() > 0 || 1) {
+              // read the incoming byte:
+              incomingByte = Serial.read();
+ 
+              // say what you got:
+              Serial.print("serial: ");
+              Serial.println(incomingByte, DEC);
+      }
     
       digitalWrite(13, HIGH); // switch on LED on board
       
@@ -55,6 +68,7 @@ void loop() {
       //escServo.writeMicroseconds(ch1);
       steeringServo.writeMicroseconds(ch2);
     
+    /*
       Serial.print("Channel 1:  "); // Print the value of 
       Serial.println(ch1);        // each channel
     
@@ -62,7 +76,7 @@ void loop() {
       Serial.println(pos);
     
       Serial.println("_____________");
-    
+    */
       //delay(500); // I put this here just to make the terminal 
                   // window happier
   }
