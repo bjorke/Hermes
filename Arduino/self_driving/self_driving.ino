@@ -10,7 +10,7 @@ int pos = 0;    // variable to store the servo position
 Servo escServo;
 int escpos = 0;    // variable to store the servo position 
 
-int ch1; // Here's where we'll keep our channel values
+int ch1; // Here's where we'll keep our channel values for receiver
 int ch2;
 
 int incomingByte = 0;   // for incoming serial data
@@ -33,7 +33,7 @@ void setup() {
 
 void loop() {
   
-  int autonomous = digitalRead(2);
+  int autonomous = digitalRead(2); // switch on board
   
   if(autonomous) {
     
@@ -45,13 +45,15 @@ void loop() {
     
   } else {
     
-      if (Serial.available() > 0 || 1) {
+      if (Serial.available() > 0) {
               // read the incoming byte:
               incomingByte = Serial.read();
  
               // say what you got:
               Serial.print("serial: ");
               Serial.println(incomingByte, DEC);
+              
+              steeringServo.writeMicroseconds(random(1500, 1600));
       }
     
       digitalWrite(13, HIGH); // switch on LED on board
