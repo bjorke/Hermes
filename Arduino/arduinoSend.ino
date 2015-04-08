@@ -2,48 +2,67 @@
 #include <Checksum.h>
 Checksum _Checksum;
 
-#define trigPin 13
-#define echoPin 12
-
+#define sonar1TrigPin 13
+#define sonar1EchoPin 12
+#define sonar2TrigPin 13
+#define sonar2EchoPin 12
+#define sonar3TrigPin 13
+#define sonar3EchoPin 12
 
 void setup() {
   Serial.begin(9600);
 
   // set up sonar
 
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
-
-
-
+  pinMode(sonar1TrigPin, OUTPUT);
+  pinMode(sonar1EchoPin, INPUT);
+  pinMode(sonar2TrigPin, OUTPUT);
+  pinMode(sonar2EchoPin, INPUT);
+  pinMode(sonar3TrigPin, OUTPUT);
+  pinMode(sonar3EchoPin, INPUT);
 }
 
 void loop() {
-  short int duration,distance,distance1,distance2;
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  duration = pulseIn(echoPin, HIGH);
-  distance = (duration/2) / 29.1;
+  short int sonar1,sonar2,sonar3;
+  sonar1 = sonar(sonar1EchoPin,sonar1TrigPin);
+  sonar2 = sonar(sonar2EchoPin,sonar2TrigPin);
+  sonar3 = sonar(sonar3EchoPin,sonar3TrigPin);
 
-  distance1 = distance *1.564;
-  distance2 = distance *0.654;
+  //#####################
+  //Only for testing
+  sonar2 = sonar2 *1.564;
+  sonar3 = sonar3 *0.654;
+  //#####################
 
   char sumCheck;
-  sumCheck = distance;
+  sumCheck = sonar1;
+  sumCheck += sonar2;
+  sumCheck += sonar3;
   short int checkSum = _Checksum.generate_verhoeff(&sumCheck);
 
   String sendString = "!";
-  sendString += distance;
+  sendString += sonar1;
   sendString += ",";
-  sendString += distance1;
+  sendString += sonar2;
   sendString += ",";
-  sendString += distance2;
+  sendString += sonar3;
   sendString += ",";
   sendString += checkSum;
   Serial.println(sendString);
 
   delay(1);
+}
+
+short int sonar(short int echo,short int trigger){
+  short int duration,distance;
+
+  digitalWrite(trigger, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigger, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigger, LOW);
+  duration = pulseIn(echo, HIGH);
+  distance = (duration/2) / 29.1;
+
+  return distance;
 }
