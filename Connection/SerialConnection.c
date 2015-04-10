@@ -6,6 +6,10 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
+#include <sys/shm.h>
+#include <ctype.h>
+#include "SerialConnection.h"
 #define BAUDRATE B9600
 #define MODEMDEVICE "/dev/tty.usbmodem1411"/*UART NAME IN PROCESSOR*/
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
@@ -20,32 +24,105 @@ unsigned char *var;
 struct termios oldtp, newtp;
 char sendcmd1[10]="\0";
 FILE *file;
+bool runner = true;
 
 void  readport(void){
-	unsigned char buff;
-	file = fopen( "output.txt", "w+" );
-	int looper = 0;
-  	while (looper < 1000) {
-    		n = read(fd, &buff, 1);
-		//	fcntl(fd,F_SETFL,0);
-		if (n == -1) switch(errno) {
-		case EAGAIN: /* sleep() */
-		continue;
+  //file = fopen( "output.txt", "w+" );
+  short int parsedValLoop = 0;
+  char string[128];
 
-		}
-		if (n ==0) {
-			break
-		};
-		fputc(buff, file);
-		printf("%d \"%c\"\n", n,buff);
-		looper++;
-	}
-	fclose (file);
+  while (runner) {
+    unsigned char buff;
+    n = read(fd, &buff, 1);
+    //	fcntl(fd,F_SETFL,0);
+    if (n == -1) switch(errno) {
+      case EAGAIN: /* sleep() */
+      continue;
+    }
+    if (n ==0) {
+      break;
+    };
+    //printf("%c",buff);
+    if(buff == '!'){
+      //printf("%s\n",string);
+      short int sendInt[6];
+      short int sendIntLoop = 0;
+      for(int i = 0; i < sizeof(string);i++){
+        if(string[i] == ','){
+          //printf("string[i] %c\n",string[i]);
+          sendIntLoop += 1;
+        }
+        else if(isdigit(string[i])){
+          //printf("%i\n",string[i]- '0');
+          sendInt[sendIntLoop] = string[i]- '0';;
+        }
+      }
+      /*
+      for(int i = 0; i < sizeof(sendInt)/sizeof(short int);i++){
+        printf("%i\n",sendInt[i]);
+      };
+      */
+      //sendDataToMem();
+
+      //reset the array
+      memset(string, 0, sizeof(string));
+
+    }
+    else{
+      if(isdigit(buff) || buff == ','){
+      //adds everything to the array
+      strcat(string,(char*)&buff);
+    }
+  }
+
+
+  }
+  fclose (file);
+}
+
+void sendDataToMem(){
+  int runner = 1;
+  key_t shm_key = ftok("./somefile", 'b');
+  const int shm_size = 1024;
+
+  int shm_id;
+  char* shmaddr, *ptr;
+  int next[2];
+
+  printf ("writer started.\n");
+  while(runner == 1){
+
+    /* Allocate a shared memory segment. */
+    shm_id = shmget (shm_key, shm_size, IPC_CREAT | S_IRUSR | S_IWUSR);
+
+    /* Attach the shared memory segment. */
+    shmaddr = (char*) shmat (shm_id, 0, 0);
+
+    printf ("shared memory attached at address %p\n", shmaddr);
+
+    /* Start to write data. */
+    ptr = shmaddr + sizeof (next);
+    next[0] = sprintf (ptr, "mandy") + 1;
+    ptr += next[0];
+    next[1] = sprintf (ptr, "73453916") + 1;
+    ptr += next[1];
+    sprintf (ptr, "amarica");
+    memcpy(shmaddr, &next, sizeof (next));
+    printf ("writer ended.\n");
+
+    /*calling the other process*/
+    //system("./read.out");
+    sleep(10);
+  };
+  /* Detach the shared memory segment. */
+  shmdt (shmaddr);
+  /* Deallocate the shared memory segment.*/
+  shmctl (shm_id, IPC_RMID, 0);
 }
 void openport(void){
 
 	 fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY |O_NDELAY );
-	 printf("oviya :%d\n",fd);
+	 printf("Connection open %d\n",fd);
    if (fd <0){
    	perror(MODEMDEVICE);
 
@@ -86,5 +163,5 @@ int main(int argc, char *argv[])    {
 
 	openport();
 	readport();
-        return 0;
+  return 0;
 }
