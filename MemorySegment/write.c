@@ -5,6 +5,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <unistd.h>
+#include <time.h>
 
 #define SHM_SIZE 1024  /* make it a 1K shared memory segment */
 
@@ -12,7 +13,7 @@ int main(int argc, char *argv[])
 {
     key_t key;
     int shmid;
-    char *data;
+    char * data;
     int mode;
 
     /* make the key: */
@@ -33,8 +34,12 @@ int main(int argc, char *argv[])
             perror("shmat");
             exit(1);
         }
-        char * inData;
-        strncpy(inData,"%i\n",rand() % 100 + 1);
+        char inData[128];
+        time_t t;
+        /* Intializes random number generator */
+        srand((unsigned) time(&t));
+        sprintf(inData,"%i\n",rand() % 100 + 1);
+
         /* read or modify the segment, based on the command line: */
         printf("writing to segment: %s", inData);
         strncpy(data, inData, SHM_SIZE);
