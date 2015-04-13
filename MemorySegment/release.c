@@ -23,19 +23,7 @@ int main(int argc, char *argv[])    {
       perror("shmget");
       exit(1);
   }
-  /* attach to the segment to get a pointer to it: */
-  data = shmat(shmid, (void *)0, 0);
-  if (data == (char *)(-1)) {
-      perror("shmat");
-      exit(1);
-  }
+  /* Deallocate the shared memory segment.*/
+  shmctl (shmid, IPC_RMID, 0);
 
-  printf("Data; %s",data);
-
-  /* detach from the segment: */
-  if (shmdt(data) == -1) {
-      perror("shmdt");
-      exit(1);
-  }
-  return 0;
 }
