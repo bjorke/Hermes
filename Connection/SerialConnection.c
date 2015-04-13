@@ -54,15 +54,10 @@ void  readport(void){
         }
         else if(isdigit(string[i])){
           //printf("%i\n",string[i]- '0');
-          sendInt[sendIntLoop] = string[i]- '0';;
+          sendInt[sendIntLoop] = string[i]- '0';
         }
       }
-      /*
-      for(int i = 0; i < sizeof(sendInt)/sizeof(short int);i++){
-        printf("%i\n",sendInt[i]);
-      };
-      */
-      //sendDataToMem();
+      sendDataToMem(sendInt);
 
       //reset the array
       memset(string, 0, sizeof(string));
@@ -79,45 +74,51 @@ void  readport(void){
   }
   fclose (file);
 }
+const int shm_size = 1024;
+int shm_id;
 
-void sendDataToMem(){
-  int runner = 1;
+void allocateMemorySpace(){
   key_t shm_key = ftok("./somefile", 'b');
-  const int shm_size = 1024;
 
-  int shm_id;
+  /* Allocate a shared memory segment. */
+  shm_id = shmget (shm_key, shm_size, IPC_CREAT | S_IRUSR | S_IWUSR);
+}
+
+void deallocateMemorySpace(){
+  /* Deallocate the shared memory segment.*/
+  shmctl (shm_id, IPC_RMID, 0);
+}
+
+void sendDataToMem(short int sendInt[6]){
+
   char* shmaddr, *ptr;
-  int next[2];
+  int next[3];
 
-  printf ("writer started.\n");
-  while(runner == 1){
 
-    /* Allocate a shared memory segment. */
-    shm_id = shmget (shm_key, shm_size, IPC_CREAT | S_IRUSR | S_IWUSR);
+  /* Attach the shared memory segment. */
+  shmaddr = (char*) shmat (shm_id, 0, 0);
 
-    /* Attach the shared memory segment. */
-    shmaddr = (char*) shmat (shm_id, 0, 0);
+  /* Start to write data. */
+  ptr = shmaddr + sizeof (next);
+  next[0] = sprintf (ptr, "123") + 1;
+  ptr += next[0];
+  next[1] = sprintf (ptr, "456asd") + 1;
+  ptr += next[1];
+  next[2] = sprintf (ptr, "456asd") + 1;
+  ptr += next[2];
+  sprintf (ptr, "789asd");
+  memcpy(shmaddr, &next, sizeof (next));
 
-    printf ("shared memory attached at address %p\n", shmaddr);
 
-    /* Start to write data. */
-    ptr = shmaddr + sizeof (next);
-    next[0] = sprintf (ptr, "mandy") + 1;
-    ptr += next[0];
-    next[1] = sprintf (ptr, "73453916") + 1;
-    ptr += next[1];
-    sprintf (ptr, "amarica");
-    memcpy(shmaddr, &next, sizeof (next));
-    printf ("writer ended.\n");
+  printf ("next %lu\n",sizeof (next));
 
     /*calling the other process*/
     //system("./read.out");
-    sleep(10);
-  };
+    //sleep(10);
+  //};
   /* Detach the shared memory segment. */
   shmdt (shmaddr);
-  /* Deallocate the shared memory segment.*/
-  shmctl (shm_id, IPC_RMID, 0);
+
 }
 void openport(void){
 
@@ -160,7 +161,7 @@ void openport(void){
 }
 
 int main(int argc, char *argv[])    {
-
+  allocateMemorySpace();
 	openport();
 	readport();
   return 0;

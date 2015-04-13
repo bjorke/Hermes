@@ -10,7 +10,7 @@ int main ()
   const int shm_size = 1024;
   int shm_id;
   char* shmaddr, *ptr;
-  char* shared_memory[3];
+  char* shared_memory[4];
   int *p;
 
   /* Allocate a shared memory segment. */
@@ -29,9 +29,17 @@ int main ()
   shared_memory[1] = ptr;
   ptr += *p;
   shared_memory[2] = ptr;
+  ptr += *p;
+  /*
+  shared_memory[3] = ptr;
+  ptr += *p;
+  shared_memory[4] = ptr;
+  */
   printf ("0=%s\n", shared_memory[0]);
   printf ("1=%s\n", shared_memory[1]);
   printf ("2=%s\n", shared_memory[2]);
+  printf ("3=%s\n", shared_memory[3]);
+  //printf ("4=%s\n", shared_memory[4]);
 
   /* Detach the shared memory segment. */
   shmdt (shmaddr);
