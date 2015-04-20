@@ -18,12 +18,12 @@ char* serialport = "/dev/tty.usbmodem1411";
 int main(int argc, char *argv[])
 {
     int fd = 0;
-    int baudrate = B9600;  // default
+    int baudrate = B115200;  // default
     char buf[256];
     int rc,n;
     int option_index = 0, opt;
 
-    fd = serialport_init(serialport,9600);
+    fd = serialport_init(serialport,115200);
     while(1){
         serialport_read_until(fd, buf, '\n');
         printf("read: %s\n",buf);

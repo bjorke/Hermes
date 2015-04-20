@@ -15,7 +15,7 @@ Checksum _Checksum;
 #define sonar5EchoPin 12
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   // set up sonar
 
@@ -40,26 +40,21 @@ int intLen(unsigned x) {
     if(x>=1000) return 4;
     if(x>=100) return 3;
     if(x>=10) return 2;
-    return 1;
+    if(x>=1) return 1;
+    return 0;
 }
 void loop() {
   //sonar setup
   short int sonar1,sonar2,sonar3,sonar4,sonar5;
   sonar1 = sonar(sonar1EchoPin,sonar1TrigPin);
-  sonar2 = sonar1 * 0.97;
-  sonar3 = sonar1 * 0.88;
-  sonar4 = sonar1 * 1.12;
-  sonar5 = sonar1 * 1.10;
-  /*
   sonar2 = sonar(sonar2EchoPin,sonar2TrigPin);
   sonar3 = sonar(sonar3EchoPin,sonar3TrigPin);
   sonar4 = sonar(sonar4EchoPin,sonar4TrigPin);
   sonar5 = sonar(sonar5EchoPin,sonar5TrigPin);
-  */
   //Generate and send message
-  Serial.println(generateMessage(sonar1,sonar2,sonar3,sonar4,sonar5));
+  generateMessage(sonar1,sonar2,sonar3,sonar4,sonar5);
 
-  delay(1);
+  delay(10);
 }
 
 short int sonar(short int echo,short int trigger){
@@ -72,25 +67,26 @@ short int sonar(short int echo,short int trigger){
   return  (duration/2) / 29.1;
 }
 
-String generateMessage(short int sonar1,short int sonar2,short int sonar3,short int sonar4,short int sonar5){
-  //checksum
-  char * sumCheck;
-  sumCheck = (char*)malloc(intLen(sonar1)+intLen(sonar2)+intLen(sonar3)+intLen(sonar4)+intLen(sonar5)+1);
-  sprintf(sumCheck,"%d%d%d%d%d",sonar1,sonar2,sonar3,sonar4,sonar5);
+void generateMessage(short int sonar1,short int sonar2,short int sonar3,short int sonar4,short int sonar5){
+    //checksum
+    char * sumCheck;
+    sumCheck = (char*)malloc(intLen(sonar1)+intLen(sonar2)+intLen(sonar3)+intLen(sonar4)+intLen(sonar5)+1);
+    sprintf(sumCheck,"%d%d%d%d%d",sonar1,sonar2,sonar3,sonar4,sonar5);
 
-  short int checkSum = _Checksum.generate_verhoeff(sumCheck);
-
-  String sendString = "!";
-  sendString += sonar1;
-  sendString += ",";
-  sendString += sonar2;
-  sendString += ",";
-  sendString += sonar3;
-  sendString += ",";
-  sendString += sonar4;
-  sendString += ",";
-  sendString += sonar5;
-  sendString += ",";
-  sendString += checkSum;
-  return sendString;
+    short int checkSum = _Checksum.generate_verhoeff(sumCheck);
+    String sendString = "!";
+    sendString += sonar1;
+    sendString += ",";
+    sendString += sonar2;
+    sendString += ",";
+    sendString += sonar3;
+    sendString += ",";
+    sendString += sonar4;
+    sendString += ",";
+    sendString += sonar5;
+    sendString += ",";
+    sendString += checkSum;
+    if(sendString.length() > 12){
+      Serial.println(sendString);
+    }
 }
