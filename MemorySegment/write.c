@@ -34,15 +34,28 @@ int main(int argc, char *argv[])
             perror("shmat");
             exit(1);
         }
-        char inData[128];
+        char* inData;
         time_t t;
         /* Intializes random number generator */
         srand((unsigned) time(&t));
-        sprintf(inData,"%i\n",rand() % 100 + 1);
-
+        int next[6];
+        inData = data + sizeof (next);
+        //next[0] = sprintf(inData,"%i\n",rand() % 100 + 1);
+        next[0] = sprintf(inData,"000")+1;
+        inData += next[0];
+        //next[1] = sprintf(inData,"%i\n",rand() % 100 + 1);
+        next[1] = sprintf(inData,"123")+1;
+        inData += next[1];
+        next[2] = sprintf(inData,"234")+1;
+        inData += next[2];
+        next[3] = sprintf(inData,"345")+1;
+        inData += next[3];
+        next[4] = sprintf(inData,"456")+1;
+        inData += next[4];
+        next[5] = sprintf(inData,"567")+1;
+        inData += next[5];
         /* read or modify the segment, based on the command line: */
-        printf("writing to segment: %s", inData);
-        strncpy(data, inData, SHM_SIZE);
+        memcpy(data, &next, sizeof (next));
 
 
         /* detach from the segment: */
@@ -50,7 +63,7 @@ int main(int argc, char *argv[])
             perror("shmdt");
             exit(1);
         }
-        sleep(10);
+        sleep(1);
     }
 
     return 0;
