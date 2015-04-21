@@ -19,14 +19,16 @@ int main(int argc, char *argv[])
 {
     int fd = 0;
     int baudrate = B115200;  // default
-    char buf[256];
     int rc,n;
     int option_index = 0, opt;
 
     fd = serialport_init(serialport,115200);
     while(1){
+        char buf[256];
         serialport_read_until(fd, buf, '\n');
-        printf("read: %s\n",buf);
+        if(buf){
+            printf("read: %s\n",buf);
+        }
     }
     exit(EXIT_SUCCESS);
 } // end main

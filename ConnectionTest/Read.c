@@ -45,7 +45,6 @@ int main(int argc, char *argv[])    {
   ptr += *p;
   shared_memory[4] = ptr;
   ptr += *p;
-  
   shared_memory[5] = ptr;
   ptr += *p;
 
