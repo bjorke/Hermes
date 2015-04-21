@@ -40,7 +40,7 @@ int main(int argc, char *argv[])    {
 
 char * cleanConnectionData(char * clean){
   #pragma clang diagnostic ignored "-Wunused-value"
-  //printf("reading %s",clean);
+  printf("reading %s",clean);
   char * sendData = (char *)malloc(128);
   //printf("starting; %c\n",*clean);
   if(*clean == '!'){
@@ -53,16 +53,17 @@ char * cleanConnectionData(char * clean){
         printf("temp \"%s\"\n",temp);
         printf("strlen(sendData); %lu\n",strlen(sendData));
         printf("strlen(temp); %lu\n",strlen(temp));
-*/
+        */
+
         if(strlen(temp) == 3){
           strcpy(sendData+strlen(sendData),temp);
         }
         else if(strlen(temp) == 2){
-          sprintf(temp,"0%s",temp)+1;
+          sprintf(temp,"0%d",atoi(temp));
           strcpy(sendData+strlen(sendData),temp);
         }
         else if(strlen(temp) == 1){
-          sprintf(temp,"00%s",temp)+1;
+          sprintf(temp,"00%d",atoi(temp));
           strcpy(sendData+strlen(sendData),temp);
         }
         else{
@@ -93,7 +94,7 @@ char * cleanConnectionData(char * clean){
   return 0;
 }
 void writeToMem(char * sendData){
-  //printf("writeToMem %s\n",sendData);
+  printf("writeToMem %s\n",sendData);
 
   /* attach to the segment to get a pointer to it: */
   data = shmat(shmid, (void *)0, 0);
