@@ -54,7 +54,7 @@ void loop() {
   //Generate and send message
   generateMessage(sonar1,sonar2,sonar3,sonar4,sonar5);
 
-  delay(10);
+  delay(10); //delay between messages
 }
 
 short int sonar(short int echo,short int trigger){
@@ -64,7 +64,18 @@ short int sonar(short int echo,short int trigger){
   delayMicroseconds(10);
   digitalWrite(trigger, LOW);
   short int duration = pulseIn(echo, HIGH);
-  return  (duration/2) / 29.1;
+  int delay = 26500;
+  int sleepTime = delay - duration;
+  delayMicroseconds(sleepTime);
+  if(duration > delay){
+    duration = delay;
+  }
+
+  short int retVal = (duration/2) / 29.1;
+  if(retVal > 0){
+    return  retVal;
+  }
+  return 0;
 }
 
 void generateMessage(short int sonar1,short int sonar2,short int sonar3,short int sonar4,short int sonar5){
