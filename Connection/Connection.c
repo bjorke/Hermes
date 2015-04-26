@@ -103,7 +103,6 @@ void writeToMem(char * sendData){
       exit(1);
   }
   char* inData;
-  /* Intializes random number generator */
   int next[6];
   inData = data + sizeof (next);
   next[0] = sprintf(inData,"%c%c%c",sendData[0],sendData[1],sendData[2])+1;
