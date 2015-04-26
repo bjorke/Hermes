@@ -77,6 +77,19 @@ short int sonar(short int echo,short int trigger){
   }
   return 0;
 }
+short int ir(int irPin){
+  short int distance = 0;
+  int val = analogRead(irPin);       // reads the value of the sharp sensor
+  distance = 2076/(val - 11);
+
+  if (distance<=0){
+    distance = 100;
+  }
+  else if(distance >35){
+    distance = 100;
+  }
+  return distance;
+}
 
 void generateMessage(short int sonar1,short int sonar2,short int sonar3,short int sonar4,short int sonar5){
     //checksum
