@@ -17,14 +17,15 @@
 
 char* serialport = "/dev/tty.usbmodem1411";
 int baudrate = 115200;  // default
+int oldVal;
 
 int main(int argc, char *argv[])    {
-  int fd = serialport_init(serialport,baudrate);
-  char write[256];
+  int fd;
+  //fd = serialport_init(serialport,baudrate);  char write[256];
   int loop = 0;
   while(1){
     readMemory(fd);
-    sleep(1);
+    usleep(1);
   }
   return 0;
 }
@@ -52,27 +53,28 @@ void readMemory(int fd){
       exit(1);
   }
 
-  p = (int *)data;
-  ptr = data + 24;
-  shared_memory[0] = ptr;
-  ptr += *p++;
-  shared_memory[1] = ptr;
-  ptr += *p;
-  shared_memory[2] = ptr;
-  ptr += *p;
-  shared_memory[3] = ptr;
-  ptr += *p;
-  shared_memory[4] = ptr;
-  ptr += *p;
+    p = (int *)data;
+    ptr = data + 12;
+    shared_memory[0] = ptr;
+    ptr += *p++;
+    shared_memory[1] = ptr;
+    ptr += *p;
+    shared_memory[2] = ptr;
 
-  shared_memory[5] = ptr;
-  ptr += *p;
-  char toSend[3];
-  sprintf(toSend,"%i",atoi(shared_memory[0]));
-  serialport_write(fd,toSend);
+    /*
+    printf("shared_memory[0] %s\n",shared_memory[0]);
+    printf("shared_memory[1] %s\n",shared_memory[1]);
+    printf("shared_memory[2] %s\n",shared_memory[2]);
+    */
+    //printf("asdqwe1!\n");
+    if(atoi(shared_memory[2]) != oldVal){
+      char* toSend = (char*)malloc(4);
+      sprintf(toSend,"%s%s",shared_memory[0],shared_memory[1]);
+      printf("toSend %s\n",toSend);
+      //serialport_write(fd,toSend);
+      oldVal = atoi(shared_memory[2]);
 
-
-
+    }
 
   /* detach from the segment: */
   if (shmdt(data) == -1) {

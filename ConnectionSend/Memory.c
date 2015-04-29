@@ -23,6 +23,10 @@ int main(int argc, char *argv[]){
 
   while(1){
     writeToMem(-1,1);
+    loop++;
+    if(loop > 98){
+      loop = 10;
+    }
     sleep(1);
   }
 }
@@ -56,10 +60,7 @@ char * sendingData(int steering, int speed){
 }
 void writeToMem(int steering, int speed){
   char * sendData = (char*)malloc(8);
-  loop++;
-  if(loop > 98){
-    loop = 10;
-  }
+
   sprintf(sendData,"%s%i",sendingData(steering,speed),loop);
   // printf("sendData %s\n",sendData);
   /* attach to the segment to get a pointer to it: */
