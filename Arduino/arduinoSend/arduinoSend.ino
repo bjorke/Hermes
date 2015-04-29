@@ -45,18 +45,44 @@ int intLen(unsigned x) {
 }
 void loop() {
   //sonar setup
-  short int sonar1,sonar2,sonar3,sonar4,sonar5;
-  sonar1 = sonar(sonar1EchoPin,sonar1TrigPin);
-  sonar2 = sonar(sonar2EchoPin,sonar2TrigPin);
-  sonar3 = sonar(sonar3EchoPin,sonar3TrigPin);
-  sonar4 = sonar(sonar4EchoPin,sonar4TrigPin);
-  sonar5 = sonar(sonar5EchoPin,sonar5TrigPin);
-  //Generate and send message
-  generateMessage(sonar1,sonar2,sonar3,sonar4,sonar5);
+  short int sonar1[5],sonar2[5],sonar3[5],sonar4[5],sonar5[5];
+  for(int i = 0;i < 5;i++){
+    sonar1[i] = sonar(sonar1EchoPin,sonar1TrigPin);
+    sonar2[i] = sonar(sonar2EchoPin,sonar2TrigPin);
+    sonar3[i] = sonar(sonar3EchoPin,sonar3TrigPin);
+    sonar4[i] = sonar(sonar4EchoPin,sonar4TrigPin);
+    sonar5[i] = sonar(sonar5EchoPin,sonar5TrigPin);
+  }
+  short int sonar1Tot,sonar2Tot,sonar3Tot,sonar4Tot,sonar5Tot;
+  //add up the arrays and make some sanity checks
+  sonar1Tot = addArray(sonar1,150);
+  sonar2Tot = addArray(sonar2,150);
+  sonar3Tot = addArray(sonar3,150);
+  sonar4Tot = addArray(sonar4,150);
+  sonar5Tot = addArray(sonar5,150);
 
-  delay(10); //delay between messages
+  //Generate and send messages
+  generateMessage(sonar1Tot,sonar2Tot,sonar3Tot,sonar4Tot,sonar5Tot);
+  //delay between messages, we don't want to send faster then the seriell connection can handle
+  delay(5);
 }
-
+short int addArray(short int sensor[5],short int maxSize){
+  //maxSize is the max length we want the sensor to handle
+  short int retVal;
+  for(int i = 0; i <sizeof(sensor);i++){
+    retVal += sensor[i];
+  }
+  // the max length we bother with in CM
+  retVal =  retVal/sizeof(sensor);
+  if (retVal > maxSize){
+    retVal = maxSize;
+  }
+  else if (retVal < 0){
+    //we want to make sure we dont send any negative numbers
+    retVal = 0;
+  }
+  return retVal;
+}
 short int sonar(short int echo,short int trigger){
   digitalWrite(trigger, LOW);
   delayMicroseconds(2);
@@ -66,7 +92,9 @@ short int sonar(short int echo,short int trigger){
   short int duration = pulseIn(echo, HIGH);
   int delay = 26500;
   int sleepTime = delay - duration;
+  //to make sure the time is roughly the same no matter the distance
   delayMicroseconds(sleepTime);
+  //since the distance is based on the duration we set a max value
   if(duration > delay){
     duration = delay;
   }
@@ -81,9 +109,9 @@ short int ir(int irPin){
   short int distance = 0;
   int val = analogRead(irPin);       // reads the value of the sharp sensor
   distance = 2076/(val - 11);
-
+  //correct?
   if (distance<=0){
-    distance = 100;
+    distance = 0;
   }
   else if(distance >35){
     distance = 100;
@@ -110,7 +138,7 @@ void generateMessage(short int sonar1,short int sonar2,short int sonar3,short in
     sendString += sonar5;
     sendString += ",";
     sendString += checkSum;
-    if(sendString.length() > 12){
+    if(sendString.length() > 11){
       Serial.println(sendString);
     }
 }
