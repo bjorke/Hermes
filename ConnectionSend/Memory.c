@@ -68,7 +68,6 @@ void writeToMem(int steering, int speed){
       perror("shmat");
   }
   char* inData;
-  /* Intializes random number generator */
   int next[3];
   inData = data + sizeof (next);
   next[0] = sprintf(inData,"%c%c",sendData[0],sendData[1])+1;
