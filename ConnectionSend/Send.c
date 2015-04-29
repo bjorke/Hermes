@@ -56,13 +56,10 @@ void readMemory(int fd){
   p = (int *)data;
   ptr = data + 12;
   shared_memory[0] = ptr;
-  shared_memory_old[0] = ptr;
   ptr += *p++;
   shared_memory[1] = ptr;
-  shared_memory_old[1] = ptr;
   ptr += *p;
   shared_memory[2] = ptr;
-  shared_memory_old[2] = ptr;
 
   /*
   printf("shared_memory[0] %s\n",shared_memory[0]);
@@ -73,8 +70,14 @@ void readMemory(int fd){
     char* toSend = (char*)malloc(4);
     sprintf(toSend,"%s%s",shared_memory[0],shared_memory[1]);
     printf("toSend %s\n",toSend);
+    serialport_write(fd,toSend);
   }
-  //serialport_write(fd,toSend);
+  ptr = data + 12;
+  shared_memory_old[0] = ptr;
+  ptr += *p++;
+  shared_memory_old[1] = ptr;
+  ptr += *p;
+  shared_memory_old[2] = ptr;
 
   /* detach from the segment: */
   if (shmdt(data) == -1) {
