@@ -4,6 +4,16 @@
 #define MID_SIGNAL 1490
 #define MIN_SIGNAL 1044
 
+// define lights pins
+int reverseLights = 12;
+int turnLeft = 11;
+int turnRight = 4; 
+int frontLights = 5;
+int brakeLights = 10;
+int rearLights = A0;
+int police1 = A1;
+int police2 = A2;
+
 Servo steeringServo;
 int pos = 0;    // variable to store the servo position 
 
@@ -17,34 +27,53 @@ int incomingByte = 0;   // for incoming serial data
 
 void setup() {
 
-  pinMode(6, INPUT);
-  pinMode(7, INPUT);
+  pinMode(8, INPUT); // receiver channel 1
+  pinMode(6, INPUT); // receiver channel 2
   
   // for autonomous switch
   pinMode(2, INPUT_PULLUP);
   pinMode(13, OUTPUT);
 
+  // controls
   steeringServo.attach(9);
   escServo.attach(3);
 
+  // lights
+  pinMode(reverseLights, OUTPUT);
+  pinMode(turnLeft, OUTPUT);
+  pinMode(turnRight, OUTPUT);
+  pinMode(frontLights, OUTPUT);
+  pinMode(brakeLights, OUTPUT);
+  
   Serial.begin(9600); // Pour a bowl of Serial
 
 }
 
+
+// normal function of the lights
+void lights(int autonomous) {
+  
+}
+
+
+
 void loop() {
   
-  int autonomous = digitalRead(2); // switch on board
+  int autonomous = digitalRead(2);
   
   if(autonomous) {
-    
-    digitalWrite(13, LOW); // switch off LED on board
+    digitalWrite(13, LOW); 
+    digitalWrite(brakeLights, LOW);
     
     steeringServo.writeMicroseconds(random(1300, 1600));
     escServo.writeMicroseconds(random(1300, 1600));
     delay(500);
     
   } else {
+    digitalWrite(13, HIGH);
+    digitalWrite(brakeLights, HIGH);
     
+    /*
       if (Serial.available() > 0) {
               // read the incoming byte:
               incomingByte = Serial.read();
@@ -55,30 +84,59 @@ void loop() {
               
               steeringServo.writeMicroseconds(random(1500, 1600));
       }
-    
-      digitalWrite(13, HIGH); // switch on LED on board
+    */
       
-      ch1 = pulseIn(6, HIGH, 25000); // each channel
-      ch2 = pulseIn(7, HIGH, 25000);
+      
+      ch1 = pulseIn(8, HIGH, 25000); // each channel
+      ch2 = pulseIn(6, HIGH, 25000);
       
       // this is shit, change it
-      
-      if(ch1 < 1300) { escServo.writeMicroseconds(MIN_SIGNAL); }
-      else if(ch1 > 1800) { escServo.writeMicroseconds(MAX_SIGNAL); }
-      else { escServo.writeMicroseconds(MID_SIGNAL); }
+
+      if(ch1 < 1150) { escServo.writeMicroseconds(MIN_SIGNAL); }
+      else if(ch1 > 2050) { escServo.writeMicroseconds(MAX_SIGNAL); }
+      else if(ch1 < 1630 && ch1 > 1580) { escServo.writeMicroseconds(MID_SIGNAL); }
+      else { escServo.writeMicroseconds(ch1); }
+
+      // for lights
+      if(ch1 < 1500) {
+        digitalWrite(reverseLights, HIGH);
+      } else if(ch1 > 1800) {
+        digitalWrite(frontLights, HIGH);      
+      } else {
+        digitalWrite(reverseLights, LOW);
+        digitalWrite(frontLights, LOW);    
+      }
+
+      if(ch2 < 1300) {
+        digitalWrite(turnLeft, HIGH);
+      } else if(ch2 > 1500) {
+        digitalWrite(turnRight, HIGH); 
+        //digitalWrite(reverseLights, HIGH);        
+      } else {
+        digitalWrite(turnLeft, LOW);
+        digitalWrite(turnRight, LOW);
+        //digitalWrite(reverseLights, LOW);                
+      }
+  
+      /*      
+      if(ch1 < 1700 && ch1 > 1500) {
+         escServo.writeMicroseconds(MID_SIGNAL);
+      } else {
+        escServo.writeMicroseconds(ch1);
+      }
+      */
       
       //escServo.writeMicroseconds(ch1);
       steeringServo.writeMicroseconds(ch2);
     
-    /*
-      Serial.print("Channel 1:  "); // Print the value of 
-      Serial.println(ch1);        // each channel
+      // write to serial
+      Serial.print("Channel 1:  ");
+      Serial.println(ch1);
     
       Serial.print("Channel 2:  ");
-      Serial.println(pos);
+      Serial.println(ch2);
     
       Serial.println("_____________");
-    */
       //delay(500); // I put this here just to make the terminal 
                   // window happier
   }
