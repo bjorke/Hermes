@@ -4,6 +4,12 @@
 #define MID_SIGNAL 1490
 #define MIN_SIGNAL 1044
 
+//
+char intBuffer[12];
+String intData = "";
+int delimiter = (int) '\n';
+//
+
 // define lights pins
 int reverseLights = 12;
 int turnLeft = 11;
@@ -45,7 +51,7 @@ void setup() {
   pinMode(frontLights, OUTPUT);
   pinMode(brakeLights, OUTPUT);
   
-  Serial.begin(9600); // Pour a bowl of Serial
+  Serial.begin(115200); // Pour a bowl of Serial
 
 }
 
@@ -65,26 +71,43 @@ void loop() {
     digitalWrite(13, LOW); 
     digitalWrite(brakeLights, LOW);
     
+    // RANDOM BEHAVIOUR - DEMO
+    /*
     steeringServo.writeMicroseconds(random(1300, 1600));
     escServo.writeMicroseconds(random(1300, 1600));
     delay(500);
+    */
+
+    while (Serial.available()) {
+        int ch = Serial.read();
+        if (ch == -1) {
+            // Handle error
+        }
+        else if (ch == delimiter) {
+            break;
+        }
+        else {
+            intData += (char) ch;
+        }
+    }
+
+    int intLength = intData.length() + 1;
+    intData.toCharArray(intBuffer, intLength);
+
+
+    // Reinitialize intData for use next time around the loop
+    intData = "";
+
+    // Convert ASCII-encoded integer to an int
+    int i = atoi(intBuffer);
     
+    if(i != 0) { Serial.println(i); }
+    
+    
+
   } else {
     digitalWrite(13, HIGH);
     digitalWrite(brakeLights, HIGH);
-    
-    /*
-      if (Serial.available() > 0) {
-              // read the incoming byte:
-              incomingByte = Serial.read();
- 
-              // say what you got:
-              Serial.print("serial: ");
-              Serial.println(incomingByte, DEC);
-              
-              steeringServo.writeMicroseconds(random(1500, 1600));
-      }
-    */
       
       
       ch1 = pulseIn(8, HIGH, 25000); // each channel
@@ -94,8 +117,9 @@ void loop() {
 
       if(ch1 < 1150) { escServo.writeMicroseconds(MIN_SIGNAL); }
       else if(ch1 > 2050) { escServo.writeMicroseconds(MAX_SIGNAL); }
-      else if(ch1 < 1630 && ch1 > 1580) { escServo.writeMicroseconds(MID_SIGNAL); }
+      else if(ch1 < 1680 && ch1 > 1530) { escServo.writeMicroseconds(MID_SIGNAL); }
       else { escServo.writeMicroseconds(ch1); }
+
 
       // for lights
       if(ch1 < 1500) {
@@ -118,13 +142,17 @@ void loop() {
         //digitalWrite(reverseLights, LOW);                
       }
   
-      /*      
-      if(ch1 < 1700 && ch1 > 1500) {
+            /*
+      if(ch1 < 1600 && ch1 > 1500) {
          escServo.writeMicroseconds(MID_SIGNAL);
-      } else {
-        escServo.writeMicroseconds(ch1);
-      }
-      */
+      } else if(ch1 > 1800) {
+          escServo.writeMicroseconds(MIN_SIGNAL);    
+      } else if(ch1 < 1200) {
+          escServo.writeMicroseconds(MAX_SIGNAL);               
+      }else {
+          escServo.writeMicroseconds(ch1);
+      }*/
+      
       
       //escServo.writeMicroseconds(ch1);
       steeringServo.writeMicroseconds(ch2);
@@ -141,3 +169,7 @@ void loop() {
                   // window happier
   }
 }
+
+
+
+
