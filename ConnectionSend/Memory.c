@@ -64,7 +64,7 @@ void writeToMem(int steering, int speed){
   sprintf(sendData,"%s%i",sendingData(steering,speed),loop);
   // printf("sendData %s\n",sendData);
   /* attach to the segment to get a pointer to it: */
-  data = shmat(shmid, (void *)0, 0);
+  data = shmat(shmid, (char *)0, 0);
   if (data == (char *)(-1)) {
       perror("shmat");
   }

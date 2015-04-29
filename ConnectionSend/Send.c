@@ -11,7 +11,7 @@
 #include <sys/shm.h>
 #include <ctype.h>
 
-#include "send.h"
+#include "Send.h"
 
 #define SHM_SIZE 1024  /* make it a 1K shared memory segment */
 
