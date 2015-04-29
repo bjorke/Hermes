@@ -54,6 +54,7 @@ char * cleanConnectionData(char * clean){
         printf("strlen(sendData); %lu\n",strlen(sendData));
         printf("strlen(temp); %lu\n",strlen(temp));
         */
+        #pragma GCC diagnostic warning "-ToDo add check if temp is valid"
 
         if(strlen(temp) == 3){
           strcpy(sendData+strlen(sendData),temp);
@@ -67,8 +68,12 @@ char * cleanConnectionData(char * clean){
           strcpy(sendData+strlen(sendData),temp);
         }
         else{
+          //if we get anything unexpected we return NULL so the message can get discarded
+          return NULL;
+          /*
           sprintf(temp,"000")+1;
           strcpy(sendData+strlen(sendData),temp);
+          */
         }
         free((char *)temp);
         temp = (char *)malloc(3);
