@@ -94,9 +94,14 @@ char * cleanConnectionData(char * clean){
         *clean ++;
       }
     }
-    return sendData;
+    if(strlen(sendData) == 12){
+      return sendData;
+    }
+    else{
+      return NULL;
+    }
   }
-  return 0;
+  return NULL;
 }
 void writeToMem(char * sendData){
   printf("writeToMem %s\n",sendData);
