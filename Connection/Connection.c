@@ -29,10 +29,12 @@ int main(int argc, char *argv[])    {
       buf = (char*)malloc(30);
       int n = serialport_read_until(fd, buf, '\n');
       if(buf){
-          char * sendData = cleanConnectionData(buf);
-          if(sendData){
-            writeToMem(sendData);
-          };
+        char * sendData = cleanConnectionData(buf);
+        //The cleanConnectionData method will return NULL if it has any errors
+        //Then we just disregard the string and add nothing
+        if(sendData){
+          writeToMem(sendData);
+        };
       }
   }
   return 0;
@@ -49,47 +51,34 @@ char * cleanConnectionData(char * clean){
     while (*clean) {
       //printf("checking; %c\n",*clean++);
       if(*clean == ','){
-        /*
-        printf("temp \"%s\"\n",temp);
-        printf("strlen(sendData); %lu\n",strlen(sendData));
-        printf("strlen(temp); %lu\n",strlen(temp));
-        */
-        #pragma GCC diagnostic warning "-ToDo add check if temp is valid"
-
         if(strlen(temp) == 3){
           strcpy(sendData+strlen(sendData),temp);
         }
         else if(strlen(temp) == 2){
+          //to make sure the string is allways the same length
           sprintf(temp,"0%d",atoi(temp));
           strcpy(sendData+strlen(sendData),temp);
         }
         else if(strlen(temp) == 1){
+          //to make sure the string is allways the same length
           sprintf(temp,"00%d",atoi(temp));
           strcpy(sendData+strlen(sendData),temp);
         }
         else{
-          //if we get anything unexpected we return NULL so the message can get discarded
+          //If the char length is of an unexpected length we send back an empty response
           return NULL;
-          /*
-          sprintf(temp,"000")+1;
-          strcpy(sendData+strlen(sendData),temp);
-          */
         }
         free((char *)temp);
         temp = (char *)malloc(3);
          *clean ++;
          *temp = '\0';
-      }
-      else if(isdigit(*clean)){
-        //printf("found digit %c\n",*clean);
-        //printf("len; %lu\n",strlen(temp));
+       }
+       //Make sure we only send digits in to the temp char
+       else if(isdigit(*clean)){
 
         sprintf(temp,"%s%c",temp,clean[0])+1;
-
-
         *clean ++;
-
-      }
+        }
       else{
         *clean ++;
       }
@@ -104,7 +93,7 @@ char * cleanConnectionData(char * clean){
   return NULL;
 }
 void writeToMem(char * sendData){
-  printf("writeToMem %s\n",sendData);
+//  printf("writeToMem %s\n",sendData);
 
   /* attach to the segment to get a pointer to it: */
   data = shmat(shmid, (void *)0, 0);
