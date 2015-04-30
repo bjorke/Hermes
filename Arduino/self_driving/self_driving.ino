@@ -115,17 +115,19 @@ void loop() {
         if(sizeof(ec1) == 2 && sizeof(ec2) == 2) {
           int ec1Int = atoi(ec1) - 50;
           int ec2int = (atoi(ec2)*10)+1000;
+          /*
           Serial.println("-------------");
           Serial.println(ec1Int);
           Serial.println(ec2int);
           Serial.println("-------------");
-
+          */
           steeringServo.writeMicroseconds(ec1Int);
           escServo.writeMicroseconds(ec2int);
         }
+        free((char*)ec1);
+        free((char*)ec2);
       }
       intData = "";
-
   }
 
 
@@ -193,5 +195,4 @@ void loop() {
                   // window happier
   }
 }
-
 
