@@ -195,13 +195,11 @@ void drive(){
         Serial.println("-------------");*/
         if(ec1Int > 1400){
           //Full right
-          Serial.println("Full right");
-          steeringServo.writeMicroseconds(1876);
+          steeringServo.writeMicroseconds(1625);
         }
         else if(ec1Int < 1300){
           //Full left
-          Serial.println("Full left");
-          steeringServo.writeMicroseconds(857);
+          steeringServo.writeMicroseconds(1075);
         }
         else{
           //steering is centerd
