@@ -78,16 +78,15 @@ void loop() {
     delay(500);
     */
 
-    while (Serial.available()) {
+    if (Serial.available() > 0) {
         int ch = Serial.read();
-        if (ch == -1) {
-            // Handle error
-        }
-        else if (ch == delimiter) {
-            break;
-        }
-        else if(ch == '!'){
+        if(ch == '!'){
           intData = "!";
+        }
+        else if(intData.length() > 4){
+          //Serial.println(intData.length());
+          drive();
+          intData = "";
         }
         else {
             intData += (char) ch;
@@ -98,51 +97,9 @@ void loop() {
     intData.toCharArray(intBuffer, intLength);*/
 
     // Reinitialize intData for use next time around the loop
-    if(intData.length() == 5){
-        if(intData.charAt(0) == '!'){
-        //Steering
-        char * ec1 = (char*)malloc(2);
-        //Speed
-        char * ec2 = (char*)malloc(2);
 
-        sprintf(ec1,"%c%c",intData.charAt(1),intData.charAt(2));
-        sprintf(ec2,"%c%c",intData.charAt(3),intData.charAt(4));
-
-        // Convert ASCII-encoded integer to an int
-        /*int i = atoi(intBuffer);*/
-
-        if(sizeof(ec1) == 2 && sizeof(ec2) == 2) {
-          //Steering
-          int ec1Int = (atoi(ec1)*10)+1000;
-          //Speed
-          int ec2Int = (atoi(ec2)*10)+1000;
-
-          Serial.println("-------------");
-          Serial.println(ec1Int);
-          Serial.println(ec2Int);
-          Serial.println("-------------");
-          if(ec1Int > 1400){
-            //Full right
-            steeringServo.writeMicroseconds(1876);
-          }
-          else if(ec1Int < 1300){
-            //Full left
-            steeringServo.writeMicroseconds(857);
-          }
-          else{
-            //steering is centerd
-            steeringServo.writeMicroseconds(1385);
-          }
-          escServo.writeMicroseconds(ec2Int);
-        }
-        free((char*)ec1);
-        free((char*)ec2);
-      }
-      intData = "";
   }
-
-
-  } else {
+  else {
     digitalWrite(13, HIGH);
     digitalWrite(brakeLights, HIGH);
 
@@ -206,3 +163,61 @@ void loop() {
                   // window happier
   }
 }
+
+void drive(){
+      if(intData.charAt(0) == '!'){
+      //Steering
+      char * ec1 = (char*)malloc(2);
+      //Speed
+      char * ec2 = (char*)malloc(2);
+
+      sprintf(ec1,"%c%c",intData.charAt(1),intData.charAt(2));
+      sprintf(ec2,"%c%c",intData.charAt(3),intData.charAt(4));
+      /*
+      Serial.println(intData.charAt(0));
+      Serial.println(intData.charAt(1));
+      Serial.println(intData.charAt(2));
+      Serial.println(intData.charAt(3));
+      Serial.println(intData.charAt(4));
+      Serial.println(intData.charAt(5));
+*/
+      // Convert ASCII-encoded integer to an int
+      /*int i = atoi(intBuffer);*/
+
+      if(sizeof(ec1) == 2 && sizeof(ec2) == 2) {
+        //Steering
+        int ec1Int = (atoi(ec1)*10)+1000;
+        //Speed
+        int ec2Int = (atoi(ec2)*10)+1000;
+        /*Serial.println("-------------");
+        Serial.println(ec1Int);
+        Serial.println(ec2Int);
+        Serial.println("-------------");*/
+        if(ec1Int > 1400){
+          //Full right
+          Serial.println("Full right");
+          steeringServo.writeMicroseconds(1876);
+        }
+        else if(ec1Int < 1300){
+          //Full left
+          Serial.println("Full left");
+          steeringServo.writeMicroseconds(857);
+        }
+        else{
+          //steering is centerd
+          steeringServo.writeMicroseconds(1385);
+        }
+        /*
+        Serial.println(ec2);
+        Serial.println(ec2Int);
+        */
+        escServo.writeMicroseconds(ec2Int);
+      }
+      //free((char*)ec1);
+      //free((char*)ec2);
+    }
+
+
+
+}
+

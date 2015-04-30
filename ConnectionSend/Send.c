@@ -21,7 +21,8 @@ int oldVal;
 
 int main(int argc, char *argv[])    {
   int fd;
-  fd = serialport_init(serialport,baudrate);  char write[256];
+  fd = serialport_init(serialport,baudrate);
+  char write[256];
   int loop = 0;
   while(1){
     readMemory(fd);
