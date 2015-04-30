@@ -42,8 +42,26 @@ void allocateMemory(){
   }
 }
 char * sendingData(int steering, int speed){
-  //we use 50 as a zero base
-  steering = steering + 50;
+  /*1385 is centerd for our servo, we send the two in the middle for zero i.e 38
+  if we get more then 1400 i.e 40 we turn right and less then 1300 i.e 30 we turn left
+  */
+  if(steering == 0){
+    steering = 38;
+  }
+  else if(steering > 0){
+    //turn right
+    steering = 50;
+  }
+  else if(steering < 0){
+    //turn left
+    steering = 20;
+  }
+  else{
+    //straight
+    steering = 38;
+  }
+
+
   if(speed > 0){
     speed = 75;
   }

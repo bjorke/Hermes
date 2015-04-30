@@ -107,22 +107,33 @@ void loop() {
 
         sprintf(ec1,"%c%c",intData.charAt(1),intData.charAt(2));
         sprintf(ec2,"%c%c",intData.charAt(3),intData.charAt(4));
-        //ec1 += intData.charAt(1);
 
         // Convert ASCII-encoded integer to an int
         /*int i = atoi(intBuffer);*/
 
         if(sizeof(ec1) == 2 && sizeof(ec2) == 2) {
-          int ec1Int = atoi(ec1) - 50;
-          int ec2int = (atoi(ec2)*10)+1000;
-          /*
+          //Steering
+          int ec1Int = (atoi(ec1)*10)+1000;
+          //Speed
+          int ec2Int = (atoi(ec2)*10)+1000;
+
           Serial.println("-------------");
           Serial.println(ec1Int);
-          Serial.println(ec2int);
+          Serial.println(ec2Int);
           Serial.println("-------------");
-          */
-          steeringServo.writeMicroseconds(ec1Int);
-          escServo.writeMicroseconds(ec2int);
+          if(ec1Int > 1400){
+            //Full right
+            steeringServo.writeMicroseconds(1876);
+          }
+          else if(ec1Int < 1300){
+            //Full left
+            steeringServo.writeMicroseconds(857);
+          }
+          else{
+            //steering is centerd
+            steeringServo.writeMicroseconds(1385);
+          }
+          escServo.writeMicroseconds(ec2Int);
         }
         free((char*)ec1);
         free((char*)ec2);
@@ -195,4 +206,3 @@ void loop() {
                   // window happier
   }
 }
-
