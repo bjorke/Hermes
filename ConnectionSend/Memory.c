@@ -63,10 +63,10 @@ char * sendingData(int steering, int speed){
 
 
   if(speed > 0){
-    speed = 75;
+    speed = 57;
   }
   else if(speed < 0){
-    speed = 25;
+    speed = 20;
   }
   else{
     speed = 50;
