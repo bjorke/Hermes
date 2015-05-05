@@ -45,36 +45,17 @@ char * sendingData(int steering, int speed){
   /*1385 is centerd for our servo, we send the two in the middle for zero i.e 38
   if we get more then 1400 i.e 40 we turn right and less then 1300 i.e 30 we turn left
   */
-  if(steering == 0){
-    steering = 38;
+  if(steering > 0 && steering < 100 && speed > 0 && speed < 101){
+    char* retVal= (char*)malloc(4);
+    sprintf(retVal,"%i%i",steering,speed);
+    // printf("retVal %s\n",retVal);
+    return retVal;
+
   }
-  else if(steering > 0){
-    //turn right
-    steering = 50;
-  }
-  else if(steering < 0){
-    //turn left
-    steering = 20;
-  }
-  else{
-    //straight
-    steering = 38;
-  }
+  //We use 50 as a zero base, so if the values are off we send 50 i.e 0
+  return 5050;
 
 
-  if(speed > 0){
-    speed = 57;
-  }
-  else if(speed < 0){
-    speed = 20;
-  }
-  else{
-    speed = 50;
-  }
-  char* retVal= (char*)malloc(4);
-  sprintf(retVal,"%i%i",steering,speed);
-  // printf("retVal %s\n",retVal);
-  return retVal;
 }
 void writeToMem(int steering, int speed){
   char * sendData = (char*)malloc(8);

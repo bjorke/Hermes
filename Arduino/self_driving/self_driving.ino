@@ -84,8 +84,15 @@ void loop() {
           intData = "!";
         }
         else if(intData.length() > 4){
-          //Serial.println(intData.length());
-          drive();
+          int * cleanInt = cleanData(intData);
+          int steering = getSteering(*(cleanInt));
+          if(checkSpeed(*(cleanInt + 1)) && steering > 0){
+            drive(steering,*(cleanInt + 1));
+          }
+          else{
+            //if there's anything wrong we set the wheels straigth and set the motor to 1500 I.E off
+            drive(1385,1500);
+          }
           intData = "";
         }
         else {
@@ -93,129 +100,145 @@ void loop() {
         }
     }
 
-    /*int intLength = intData.length() + 1;
-    intData.toCharArray(intBuffer, intLength);*/
-
-    // Reinitialize intData for use next time around the loop
-
   }
   else {
+    controller();
+  }
+}
+bool checkSpeed(int speed){
+  int minVal = 1000;
+  int maxVal = 2000;
+  if(speed > minVal && speed < maxVal){
+    return true;
+  }
+
+  return false;
+}
+int getSteering(int steering){
+  /*
+  50 is our zero base, 1385 is center
+  larger is rigth, 1876 is full rigth
+  smaller is left, 857 is full left
+  */
+  int returnVal = 0;
+  switch(steering){
+    case 30 :
+      returnVal = 857;
+      break;
+    case 40 :
+      returnVal = 1140;
+      break;
+    case 50 :
+      returnVal = 1385;
+      break;
+    case 60 :
+      returnVal = 1630;
+      break;
+    case 70 :
+      returnVal = 1876;
+      break;
+
+  }
+  return returnVal;
+
+}
+int * cleanData(String inData){
+  if(intData.charAt(0) == '!'){
+    //Serial.println(inData);
+    static int returnVal[2];
+    //Steering
+    char * ec1 = (char*)malloc(2);
+    //Speed
+    char * ec2 = (char*)malloc(2);
+
+    sprintf(ec1,"%c%c",intData.charAt(1),intData.charAt(2));
+    sprintf(ec2,"%c%c",intData.charAt(3),intData.charAt(4));
+
+    returnVal[0] =  atoi(ec1);
+    returnVal[1] =  (atoi(ec2)*10)+1000;
+    return returnVal;
+  }
+  return NULL;
+}
+void drive(int steering,int speed){
+
+  if(steering > 850 && steering < 1880 && speed > 999 && speed < 2001) {
+    /*
+    Serial.println("steering");
+    Serial.println(steering);
+    Serial.println("speed");
+    Serial.println(speed);
+    */
+    steeringServo.writeMicroseconds(steering);
+    escServo.writeMicroseconds(speed);
+  }
+  else{
+    steeringServo.writeMicroseconds(1385);
+    escServo.writeMicroseconds(1500);
+  }
+}
+void controller(){
     digitalWrite(13, HIGH);
     digitalWrite(brakeLights, HIGH);
 
 
-      ch1 = pulseIn(8, HIGH, 25000); // each channel
-      ch2 = pulseIn(6, HIGH, 25000);
+    ch1 = pulseIn(8, HIGH, 25000); // each channel
+    ch2 = pulseIn(6, HIGH, 25000);
 
-      // this is shit, change it
+    // this is shit, change it
 
-      if(ch1 < 1150) { escServo.writeMicroseconds(MIN_SIGNAL); }
-      else if(ch1 > 2050) { escServo.writeMicroseconds(MAX_SIGNAL); }
-      else if(ch1 < 1680 && ch1 > 1530) { escServo.writeMicroseconds(MID_SIGNAL); }
-      else { escServo.writeMicroseconds(ch1); }
-
-
-      // for lights
-      if(ch1 < 1500) {
-        digitalWrite(reverseLights, HIGH);
-      } else if(ch1 > 1800) {
-        digitalWrite(frontLights, HIGH);
-      } else {
-        digitalWrite(reverseLights, LOW);
-        digitalWrite(frontLights, LOW);
-      }
-
-      if(ch2 < 1300) {
-        digitalWrite(turnLeft, HIGH);
-      } else if(ch2 > 1500) {
-        digitalWrite(turnRight, HIGH);
-        //digitalWrite(reverseLights, HIGH);
-      } else {
-        digitalWrite(turnLeft, LOW);
-        digitalWrite(turnRight, LOW);
-        //digitalWrite(reverseLights, LOW);
-      }
-
-            /*
-      if(ch1 < 1600 && ch1 > 1500) {
-         escServo.writeMicroseconds(MID_SIGNAL);
-      } else if(ch1 > 1800) {
-          escServo.writeMicroseconds(MIN_SIGNAL);
-      } else if(ch1 < 1200) {
-          escServo.writeMicroseconds(MAX_SIGNAL);
-      }else {
-          escServo.writeMicroseconds(ch1);
-      }*/
+    if(ch1 < 1150) { escServo.writeMicroseconds(MIN_SIGNAL); }
+    else if(ch1 > 2050) { escServo.writeMicroseconds(MAX_SIGNAL); }
+    else if(ch1 < 1680 && ch1 > 1530) { escServo.writeMicroseconds(MID_SIGNAL); }
+    else { escServo.writeMicroseconds(ch1); }
 
 
-      //escServo.writeMicroseconds(ch1);
-      steeringServo.writeMicroseconds(ch2);
-
-      // write to serial
-      Serial.print("Channel 1:  ");
-      Serial.println(ch1);
-
-      Serial.print("Channel 2:  ");
-      Serial.println(ch2);
-
-      Serial.println("_____________");
-      //delay(500); // I put this here just to make the terminal
-                  // window happier
-  }
-}
-
-void drive(){
-      if(intData.charAt(0) == '!'){
-      //Steering
-      char * ec1 = (char*)malloc(2);
-      //Speed
-      char * ec2 = (char*)malloc(2);
-
-      sprintf(ec1,"%c%c",intData.charAt(1),intData.charAt(2));
-      sprintf(ec2,"%c%c",intData.charAt(3),intData.charAt(4));
-      /*
-      Serial.println(intData.charAt(0));
-      Serial.println(intData.charAt(1));
-      Serial.println(intData.charAt(2));
-      Serial.println(intData.charAt(3));
-      Serial.println(intData.charAt(4));
-      Serial.println(intData.charAt(5));
-*/
-      // Convert ASCII-encoded integer to an int
-      /*int i = atoi(intBuffer);*/
-
-      if(sizeof(ec1) == 2 && sizeof(ec2) == 2) {
-        //Steering
-        int ec1Int = (atoi(ec1)*10)+1000;
-        //Speed
-        int ec2Int = (atoi(ec2)*10)+1000;
-        /*Serial.println("-------------");
-        Serial.println(ec1Int);
-        Serial.println(ec2Int);
-        Serial.println("-------------");*/
-        if(ec1Int > 1400){
-          //Full right
-          steeringServo.writeMicroseconds(1625);
-        }
-        else if(ec1Int < 1300){
-          //Full left
-          steeringServo.writeMicroseconds(1075);
-        }
-        else{
-          //steering is centerd
-          steeringServo.writeMicroseconds(1385);
-        }
-        /*
-        Serial.println(ec2);
-        Serial.println(ec2Int);
-        */
-        escServo.writeMicroseconds(ec2Int);
-      }
-      //free((char*)ec1);
-      //free((char*)ec2);
+    // for lights
+    if(ch1 < 1500) {
+      digitalWrite(reverseLights, HIGH);
+    } else if(ch1 > 1800) {
+      digitalWrite(frontLights, HIGH);
+    } else {
+      digitalWrite(reverseLights, LOW);
+      digitalWrite(frontLights, LOW);
     }
 
+    if(ch2 < 1300) {
+      digitalWrite(turnLeft, HIGH);
+    } else if(ch2 > 1500) {
+      digitalWrite(turnRight, HIGH);
+      //digitalWrite(reverseLights, HIGH);
+    } else {
+      digitalWrite(turnLeft, LOW);
+      digitalWrite(turnRight, LOW);
+      //digitalWrite(reverseLights, LOW);
+    }
+
+          /*
+    if(ch1 < 1600 && ch1 > 1500) {
+       escServo.writeMicroseconds(MID_SIGNAL);
+    } else if(ch1 > 1800) {
+        escServo.writeMicroseconds(MIN_SIGNAL);
+    } else if(ch1 < 1200) {
+        escServo.writeMicroseconds(MAX_SIGNAL);
+    }else {
+        escServo.writeMicroseconds(ch1);
+    }*/
+
+
+    //escServo.writeMicroseconds(ch1);
+    steeringServo.writeMicroseconds(ch2);
+
+    // write to serial
+    Serial.print("Channel 1:  ");
+    Serial.println(ch1);
+
+    Serial.print("Channel 2:  ");
+    Serial.println(ch2);
+
+    Serial.println("_____________");
+    //delay(500); // I put this here just to make the terminal
+                // window happier
 
 
 }
-
