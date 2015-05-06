@@ -1,12 +1,12 @@
 #include <stdio.h>
-#include <Checksum.h>
+//#include <Checksum.h>
 #include <stdlib.h>
-Checksum _Checksum;
+//Checksum _Checksum;
 
-#define sonar1TrigPin 13
-#define sonar1EchoPin 12
-#define sonar2TrigPin 13
-#define sonar2EchoPin 12
+#define sonar1TrigPin 50
+#define sonar1EchoPin 51
+#define sonar2TrigPin 52
+#define sonar2EchoPin 53
 #define sonar3TrigPin 13
 #define sonar3EchoPin 12
 #define sonar4TrigPin 13
@@ -121,11 +121,11 @@ short int ir(int irPin){
 
 void generateMessage(short int sonar1,short int sonar2,short int sonar3,short int sonar4,short int sonar5){
     //checksum
-    char * sumCheck;
-    sumCheck = (char*)malloc(intLen(sonar1)+intLen(sonar2)+intLen(sonar3)+intLen(sonar4)+intLen(sonar5)+1);
-    sprintf(sumCheck,"%d%d%d%d%d",sonar1,sonar2,sonar3,sonar4,sonar5);
+    //char * sumCheck;
+    //sumCheck = (char*)malloc(intLen(sonar1)+intLen(sonar2)+intLen(sonar3)+intLen(sonar4)+intLen(sonar5)+1);
+    //sprintf(sumCheck,"%d%d%d%d%d",sonar1,sonar2,sonar3,sonar4,sonar5);
 
-    short int checkSum = _Checksum.generate_verhoeff(sumCheck);
+    //short int checkSum = _Checksum.generate_verhoeff(sumCheck);
     String sendString = "!";
     sendString += sonar1;
     sendString += ",";
@@ -136,9 +136,9 @@ void generateMessage(short int sonar1,short int sonar2,short int sonar3,short in
     sendString += sonar4;
     sendString += ",";
     sendString += sonar5;
-    sendString += ",";
-    sendString += checkSum;
-    if(sendString.length() > 11){
+    //sendString += ",";
+    //sendString += checkSum;
+    //if(sendString.length() > 11){
       Serial.println(sendString);
-    }
+    //}
 }
