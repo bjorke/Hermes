@@ -1,4 +1,3 @@
-
 #include <stdio.h>    /* Standard input/output definitions */
 #include <stdlib.h>
 #include <stdint.h>   /* Standard types */
