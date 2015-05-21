@@ -109,7 +109,6 @@ short int ir(int irPin){
   short int distance = 0;
   int val = analogRead(irPin);       // reads the value of the sharp sensor
   distance = 2076/(val - 11);
-  //correct?
   if (distance<=0){
     distance = 0;
   }

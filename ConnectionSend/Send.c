@@ -62,16 +62,11 @@ void readMemory(int fd){
     ptr += *p;
     shared_memory[2] = ptr;
 
-    /*
-    printf("shared_memory[0] %s\n",shared_memory[0]);
-    printf("shared_memory[1] %s\n",shared_memory[1]);
-    printf("shared_memory[2] %s\n",shared_memory[2]);
-    */
-    //printf("asdqwe1!\n");
+
     if(atoi(shared_memory[2]) != oldVal){
       char* toSend = (char*)malloc(4);
       sprintf(toSend,"!%s%s0",shared_memory[0],shared_memory[1]);
-      printf("toSend %s\n",toSend);
+      //printf("toSend %s\n",toSend);
       serialport_write(fd,toSend);
       oldVal = atoi(shared_memory[2]);
 
