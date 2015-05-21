@@ -10,3 +10,6 @@ Seriel connection for Odroid-U3 to Arduino
 ./ConnectionSend/Memory.c is the code running in open davinci to send the data to memory.
 ./Arduino/self_driving/self_driving.ino is the code running on the Arduino controlling the steering and speed.
 ./ConnectionSend/Deallocate.c is for release the memory.
+
+./Arduino/Razor_AHRS contains the firmware on the 9DOF Razor IMU (for the compass) configured and calibrated for our needs.
+./Arduino/CompassTest is the code that gathers compass heading data from the RazorBoard, hopefully to be integrated into arduinosend.ino
