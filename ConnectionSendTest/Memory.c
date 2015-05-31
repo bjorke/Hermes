@@ -20,13 +20,9 @@ int loop = 10;
 
 int main(int argc, char *argv[]){
   allocateMemory();
-  while(1){
-    writeToMem(loop);
-    loop++;
-    if(loop > 98){
-      loop = 10;
-    }
-    sleep(1);
+  //check to make sure we have the propper length
+  if(strlen(argv[1]) == 5){
+    writeToMem(atoi(argv[1]));
   }
 }
 void allocateMemory(){
@@ -44,7 +40,7 @@ void allocateMemory(){
 void writeToMem(int loop){
   char * sendData = (char*)malloc(8);
 
-  sprintf(sendData,"%i%i%i",loop,loop,loop);
+  sprintf(sendData,"%d",loop);
   printf("sendData %s\n",sendData);
   /* attach to the segment to get a pointer to it: */
   data = shmat(shmid, (void *)0, 0);
