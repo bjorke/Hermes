@@ -7,12 +7,12 @@
 #define sonar1EchoPin 51
 #define sonar2TrigPin 52
 #define sonar2EchoPin 53
-#define sonar3TrigPin 13
-#define sonar3EchoPin 12
-#define sonar4TrigPin 13
-#define sonar4EchoPin 12
-#define sonar5TrigPin 13
-#define sonar5EchoPin 12
+#define sonar3TrigPin 8
+#define sonar3EchoPin 9
+#define sonar4TrigPin 47
+#define sonar4EchoPin 46
+#define sonar5TrigPin 49
+#define sonar5EchoPin 48
 
 void setup() {
   Serial.begin(115200);
@@ -64,7 +64,7 @@ void loop() {
   //Generate and send messages
   generateMessage(sonar1Tot,sonar2Tot,sonar3Tot,sonar4Tot,sonar5Tot);
   //delay between messages, we don't want to send faster then the seriell connection can handle
-  delay(5);
+  //delay(5);
 }
 short int addArray(short int sensor[5],short int maxSize){
   //maxSize is the max length we want the sensor to handle
@@ -91,6 +91,7 @@ short int sonar(short int echo,short int trigger){
   digitalWrite(trigger, LOW);
   short int duration = pulseIn(echo, HIGH);
   int delay = 26500;
+
   int sleepTime = delay - duration;
   //to make sure the time is roughly the same no matter the distance
   delayMicroseconds(sleepTime);
@@ -141,3 +142,4 @@ void generateMessage(short int sonar1,short int sonar2,short int sonar3,short in
       Serial.println(sendString);
     //}
 }
+
